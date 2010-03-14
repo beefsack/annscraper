@@ -84,6 +84,8 @@ class AnimePageScraper extends PageScraper
 			->registerSearch(new SearchAnimeGenres())
 			->registerSearch(new SearchAnimeThemes())
 			->registerSearch(new SearchAnimeRelated())
+			->registerSearch(new SearchAnimeVintage())
+			->registerSearch(new SearchAnimeStats())
 		;
 	}
 }
@@ -192,6 +194,56 @@ class SearchAnimeRelated extends Search
 					);
 				}
 			}
+		}
+		return $values;
+	}
+}
+
+class SearchAnimeVintage extends Search
+{
+	protected $_name = 'vintage';
+	
+	public function parse($data)
+	{
+		$value = null;
+		// Get vintage
+		if (preg_match('/<STRONG>Vintage:<\/STRONG>[^<]*<SPAN>([^<]*)<\/SPAN>/s', $data, $matches)) {
+			$value = $matches[1];
+		}
+		return $value;
+	}
+}
+
+class SearchAnimeStats extends Search
+{
+	protected $_name = 'stats';
+	
+	public function parse($data)
+	{
+		$values = array();
+		// Seen
+		if (preg_match('/<B>Seen<\/B>[^<\d]*(\d*) users/s', $data, $matches)) {
+			$values['seen'] = (int) $matches[1];
+		}
+		// Median rating
+		if (preg_match('/<B>Median rating:<\/B>\s*([^<]*)\s*<BR>/s', $data, $matches)) {
+			$values['medianrating'] = $matches[1];
+		}
+		// Arithmetic mean
+		if (preg_match('/<B>Arithmetic mean:<\/B>\s*([\d\.]+)/s', $data, $matches)) {
+			$values['arithmeticmean'] = (float) $matches[1];
+		}
+		// Weighted mean
+		if (preg_match('/<B>Weighted mean:<\/B>\s*([\d\.]+)/s', $data, $matches)) {
+			$values['weightedmean'] = (float) $matches[1];
+		}
+		// Bayesian
+		if (preg_match('/<B>Bayesian estimate:<\/B>\s*([\d\.]+)/s', $data, $matches)) {
+			$values['bayesian'] = (float) $matches[1];
+		}
+		// Rank
+		if (preg_match('/<B>Bayesian estimate:<\/B>[^<]*rank: #([\d]*)/s', $data, $matches)) {
+			$values['rank'] = (int) $matches[1];
 		}
 		return $values;
 	}
