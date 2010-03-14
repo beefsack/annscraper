@@ -114,20 +114,23 @@ abstract class ANNScraper_Search
 
 class ANNScraper_SearchAnimeTitles extends ANNScraper_Search
 {
-	protected $_name = 'title';
+	protected $_name = 'titles';
 	
 	public function parse($data)
 	{
 		$values = array();
 		// Get english title
 		if (preg_match('/<h1 id="page_header">(.*?)<\/h1>/', $data, $matches)) {
-			$values['English'] = $matches[1];
+			$values['main'] = $matches[1];
 		}
 		// Get other titles
 		if (preg_match('/<STRONG>Alternative title:<\/STRONG>(.*?)<DIV CLASS="encyc/s', $data, $matches)) {
 			if (preg_match_all('/<DIV CLASS="tab">(.*?)\s*\((.*?)\)<\/DIV>/', $matches[1], $titles)) {
 				foreach ($titles[1] as $key => $name) {
-					$values[$titles[2][$key]] = $name;
+					$values['alternate'][] = array(
+						'language' => $titles[2][$key],
+						'title' => $name,
+					);
 				}
 			}
 		}
@@ -137,7 +140,7 @@ class ANNScraper_SearchAnimeTitles extends ANNScraper_Search
 
 class ANNScraper_SearchAnimeGenres extends ANNScraper_Search
 {
-	protected $_name = 'genre';
+	protected $_name = 'genres';
 	
 	public function parse($data)
 	{
@@ -146,7 +149,10 @@ class ANNScraper_SearchAnimeGenres extends ANNScraper_Search
 		if (preg_match('/<STRONG>Genres:<\/STRONG>(.*?)<DIV CLASS="encyc/s', $data, $matches)) {
 			if (preg_match_all('/<SPAN><a href="[^"]*g=([^&"]*)[^>]*>([^<]*)<\/a><\/SPAN>/', $matches[1], $genres)) {
 				foreach ($genres[2] as $key => $name) {
-					$values[$genres[1][$key]] = $name;
+					$values = array(
+						'id' => $genres[1][$key],
+						'name' => $name,
+					);
 				}
 			}
 		}
@@ -156,7 +162,7 @@ class ANNScraper_SearchAnimeGenres extends ANNScraper_Search
 
 class ANNScraper_SearchAnimeThemes extends ANNScraper_Search
 {
-	protected $_name = 'theme';
+	protected $_name = 'themes';
 	
 	public function parse($data)
 	{
@@ -165,7 +171,10 @@ class ANNScraper_SearchAnimeThemes extends ANNScraper_Search
 		if (preg_match('/<STRONG>Themes:<\/STRONG> (.*?)<DIV CLASS="encyc/s', $data, $matches)) {
 			if (preg_match_all('/<SPAN><a href="[^"]*th=([^&"]*)[^>]*>([^<]*)<\/a><\/SPAN>/', $matches[1], $themes)) {
 				foreach ($themes[2] as $key => $name) {
-					$values[$themes[1][$key]] = $name;
+					$values = array(
+						'id' => $themes[1][$key],
+						'name' => $name,
+					);
 				}
 			}
 		}
@@ -182,7 +191,8 @@ class ANNScraper_SearchAnimeRelated extends ANNScraper_Search
 		$values = array();
 		// Get main relation
 		if (preg_match('/<\/DIV><SMALL>\[ (.*?) <A  HREF="[^"]*\/([^"\/]*?)\.php[^"]*id=([^"&]*)">([^<]*)<\/A> \]<BR><BR><\/SMALL>/s', $data, $matches)) {
-			$values[$matches[3]] = array(
+			$values[] = array(
+				'id' => (int) $matches[3],
 				'relation' => $matches[1],
 				'type' => $matches[2],
 				'name' => $matches[4],
@@ -192,7 +202,8 @@ class ANNScraper_SearchAnimeRelated extends ANNScraper_Search
 		if (preg_match('/<B>Related anime:<\/B>(.*?)<DIV CLASS="encyc/s', $data, $matches)) {
 			if (preg_match_all('/<A  HREF="[^"]*\/([^"\/]*?)\.php[^"]*id=([^"&]*)">([^<]*)<\/A>[^\(]*(\(([^\)]*)\))?<BR>/s', $matches[1], $relations)) {
 				foreach ($relations[2] as $key => $id) {
-					$values[$id] = array(
+					$values[] = array(
+						'id' => (int) $id,
 						'relation' => $relations[5][$key],
 						'type' => $relations[1][$key],
 						'name' => $relations[3][$key],
