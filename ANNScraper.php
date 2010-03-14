@@ -80,7 +80,11 @@ class AnimePageScraper extends PageScraper
 	
 	public function __construct()
 	{
-		$this->registerSearch(new SearchAnimeTitles());
+		$this->registerSearch(new SearchAnimeTitles())
+			->registerSearch(new SearchAnimeGenres())
+			->registerSearch(new SearchAnimeThemes())
+			->registerSearch(new SearchAnimeRelated())
+		;
 	}
 }
 
@@ -124,6 +128,75 @@ class SearchAnimeTitles extends Search
 	}
 }
 
+class SearchAnimeGenres extends Search
+{
+	protected $_name = 'genre';
+	
+	public function parse($data)
+	{
+		$values = array();
+		// Get genres
+		if (preg_match('/<STRONG>Genres:<\/STRONG>(.*?)<DIV CLASS="encyc/s', $data, $matches)) {
+			if (preg_match_all('/<SPAN><a href="[^"]*g=([^&"]*)[^>]*>([^<]*)<\/a><\/SPAN>/', $matches[1], $genres)) {
+				foreach ($genres[2] as $key => $name) {
+					$values[$genres[1][$key]] = $name;
+				}
+			}
+		}
+		return $values;
+	}
+}
+
+class SearchAnimeThemes extends Search
+{
+	protected $_name = 'theme';
+	
+	public function parse($data)
+	{
+		$values = array();
+		// Get genres
+		if (preg_match('/<STRONG>Themes:<\/STRONG> (.*?)<DIV CLASS="encyc/s', $data, $matches)) {
+			if (preg_match_all('/<SPAN><a href="[^"]*th=([^&"]*)[^>]*>([^<]*)<\/a><\/SPAN>/', $matches[1], $themes)) {
+				foreach ($themes[2] as $key => $name) {
+					$values[$themes[1][$key]] = $name;
+				}
+			}
+		}
+		return $values;
+	}
+}
+
+class SearchAnimeRelated extends Search
+{
+	protected $_name = 'related';
+	
+	public function parse($data)
+	{
+		$values = array();
+		// Get main relation
+		if (preg_match('/<\/DIV><SMALL>\[ (.*?) <A  HREF="[^"]*\/([^"\/]*?)\.php[^"]*id=([^"&]*)">([^<]*)<\/A> \]<BR><BR><\/SMALL>/s', $data, $matches)) {
+			$values[$matches[3]] = array(
+				'relation' => $matches[1],
+				'type' => $matches[2],
+				'name' => $matches[4],
+			);
+		}
+		// Get other relations
+		if (preg_match('/<B>Related anime:<\/B>(.*?)<DIV CLASS="encyc/s', $data, $matches)) {
+			if (preg_match_all('/<A  HREF="[^"]*\/([^"\/]*?)\.php[^"]*id=([^"&]*)">([^<]*)<\/A>[^\(]*(\(([^\)]*)\))?<BR>/s', $matches[1], $relations)) {
+				foreach ($relations[2] as $key => $id) {
+					$values[$id] = array(
+						'relation' => $relations[5][$key],
+						'type' => $relations[1][$key],
+						'name' => $relations[3][$key],
+					);
+				}
+			}
+		}
+		return $values;
+	}
+}
+
 // Exceptions
 
 class ScraperClassNotFound extends Exception {};
@@ -146,4 +219,4 @@ class ANNScraper
 // Testing
 
 $scraper = new ANNScraper();
-var_dump($scraper->fetchAnime(9701));
+var_dump($scraper->fetchAnime(7809));
