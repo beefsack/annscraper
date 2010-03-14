@@ -6,6 +6,7 @@ class ANNScraper_PageScraper
 {
 	protected $_url;
 	protected $_urlValues = array();
+	protected $_requestUrl;
 	protected $_response;
 	protected $_data = array();
 	protected $_searches = array();
@@ -34,11 +35,11 @@ class ANNScraper_PageScraper
 		if (!isset($this->_url)) {
 			throw new ANNScraper_UrlNotSpecified();
 		}
-		$url = $this->_url;
+		$this->_requestUrl = $this->_url;
 		foreach ($this->_urlValues as $key => $value) {
-			$url = str_replace('{{{'.$key.'}}}', $value, $url);
+			$this->_requestUrl = str_replace('{{{'.$key.'}}}', $value, $this->_requestUrl);
 		}
-		$ch = curl_init($url);
+		$ch = curl_init($this->_requestUrl);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		$this->_response = curl_exec($ch);
 		curl_close($ch);
@@ -48,6 +49,10 @@ class ANNScraper_PageScraper
 	protected function _parseResponse()
 	{
 		$data = array();
+		$data['request'] = array(
+			'url' => $this->_requestUrl,
+			'values' => $this->_urlValues,
+		);
 		foreach ($this->_searches as $search) {
 			$data = array_merge($data, array(
 				$search->getName() => $search->parse($this->_response)
@@ -271,4 +276,13 @@ class ANNScraper
 // Testing
 
 $scraper = new ANNScraper();
-var_dump($scraper->fetchAnime(7809));
+var_dump($scraper->fetchAnime(9701));
+var_dump($scraper->fetchAnime(210));
+var_dump($scraper->fetchAnime(9173));
+var_dump($scraper->fetchAnime(377));
+var_dump($scraper->fetchAnime(13));
+var_dump($scraper->fetchAnime(197));
+var_dump($scraper->fetchAnime(6592));
+var_dump($scraper->fetchAnime(5923));
+var_dump($scraper->fetchAnime(6733));
+var_dump($scraper->fetchAnime(10544));
