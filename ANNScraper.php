@@ -2,7 +2,7 @@
 
 // Scrapers
 
-class PageScraper
+class ANNScraper_PageScraper
 {
 	protected $_url;
 	protected $_urlValues = array();
@@ -13,11 +13,11 @@ class PageScraper
 	static public function fetch($class, array $urlValues = array())
 	{
 		if (!class_exists($class)) {
-			throw new ScraperClassNotFound();
+			throw new ANNScraper_ScraperClassNotFound();
 		}
 		$obj = new $class;
-		if (!($obj instanceof PageScraper)) {
-			throw new ObjectNotChildOfPageScraper();
+		if (!($obj instanceof ANNScraper_PageScraper)) {
+			throw new ANNScraper_ObjectNotChildOfPageScraper();
 		}
 		return $obj->setValues($urlValues)->scrape()->getData();
 	}
@@ -32,7 +32,7 @@ class PageScraper
 	protected function _requestPage()
 	{
 		if (!isset($this->_url)) {
-			throw new UrlNotSpecified();
+			throw new ANNScraper_UrlNotSpecified();
 		}
 		$url = $this->_url;
 		foreach ($this->_urlValues as $key => $value) {
@@ -62,7 +62,7 @@ class PageScraper
 		return $this;
 	}
 	
-	public function registerSearch(Search $search)
+	public function registerSearch(ANNScraper_Search $search)
 	{
 		$this->_searches[] = $search;
 		return $this;
@@ -74,25 +74,25 @@ class PageScraper
 	}
 }
 
-class AnimePageScraper extends PageScraper
+class ANNScraper_AnimePageScraper extends ANNScraper_PageScraper
 {
 	protected $_url = 'http://www.animenewsnetwork.com/encyclopedia/anime.php?id={{{id}}}';
 	
 	public function __construct()
 	{
-		$this->registerSearch(new SearchAnimeTitles())
-			->registerSearch(new SearchAnimeGenres())
-			->registerSearch(new SearchAnimeThemes())
-			->registerSearch(new SearchAnimeRelated())
-			->registerSearch(new SearchAnimeVintage())
-			->registerSearch(new SearchAnimeStats())
+		$this->registerSearch(new ANNScraper_SearchAnimeTitles())
+			->registerSearch(new ANNScraper_SearchAnimeGenres())
+			->registerSearch(new ANNScraper_SearchAnimeThemes())
+			->registerSearch(new ANNScraper_SearchAnimeRelated())
+			->registerSearch(new ANNScraper_SearchAnimeVintage())
+			->registerSearch(new ANNScraper_SearchAnimeStats())
 		;
 	}
 }
 
 // Searches
 
-abstract class Search
+abstract class ANNScraper_Search
 {
 	protected $_name;
 	
@@ -101,13 +101,13 @@ abstract class Search
 	public function getName()
 	{
 		if (!isset($this->_name)) {
-			throw new SearchNameNotSpecified();
+			throw new ANNScraper_SearchNameNotSpecified();
 		}
 		return $this->_name;
 	}
 }
 
-class SearchAnimeTitles extends Search
+class ANNScraper_SearchAnimeTitles extends ANNScraper_Search
 {
 	protected $_name = 'title';
 	
@@ -130,7 +130,7 @@ class SearchAnimeTitles extends Search
 	}
 }
 
-class SearchAnimeGenres extends Search
+class ANNScraper_SearchAnimeGenres extends ANNScraper_Search
 {
 	protected $_name = 'genre';
 	
@@ -149,7 +149,7 @@ class SearchAnimeGenres extends Search
 	}
 }
 
-class SearchAnimeThemes extends Search
+class ANNScraper_SearchAnimeThemes extends ANNScraper_Search
 {
 	protected $_name = 'theme';
 	
@@ -168,7 +168,7 @@ class SearchAnimeThemes extends Search
 	}
 }
 
-class SearchAnimeRelated extends Search
+class ANNScraper_SearchAnimeRelated extends ANNScraper_Search
 {
 	protected $_name = 'related';
 	
@@ -199,7 +199,7 @@ class SearchAnimeRelated extends Search
 	}
 }
 
-class SearchAnimeVintage extends Search
+class ANNScraper_SearchAnimeVintage extends ANNScraper_Search
 {
 	protected $_name = 'vintage';
 	
@@ -214,7 +214,7 @@ class SearchAnimeVintage extends Search
 	}
 }
 
-class SearchAnimeStats extends Search
+class ANNScraper_SearchAnimeStats extends ANNScraper_Search
 {
 	protected $_name = 'stats';
 	
@@ -251,10 +251,10 @@ class SearchAnimeStats extends Search
 
 // Exceptions
 
-class ScraperClassNotFound extends Exception {};
-class ObjectNotChildOfPageScraper extends Exception {};
-class UrlNotSpecified extends Exception {};
-class SearchNameNotSpecified extends Exception {};
+class ANNScraper_ScraperClassNotFound extends Exception {};
+class ANNScraper_ObjectNotChildOfPageScraper extends Exception {};
+class ANNScraper_UrlNotSpecified extends Exception {};
+class ANNScraper_SearchNameNotSpecified extends Exception {};
 
 // Main class
 
@@ -262,7 +262,7 @@ class ANNScraper
 {
 	public function fetchAnime($id)
 	{
-		return PageScraper::fetch('AnimePageScraper', array(
+		return ANNScraper_PageScraper::fetch('ANNScraper_AnimePageScraper', array(
 			'id' => $id,
 		));
 	}
