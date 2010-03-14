@@ -272,17 +272,3 @@ class ANNScraper
 		));
 	}
 }
-
-// Testing
-
-$scraper = new ANNScraper();
-var_dump($scraper->fetchAnime(9701));
-var_dump($scraper->fetchAnime(210));
-var_dump($scraper->fetchAnime(9173));
-var_dump($scraper->fetchAnime(377));
-var_dump($scraper->fetchAnime(13));
-var_dump($scraper->fetchAnime(197));
-var_dump($scraper->fetchAnime(6592));
-var_dump($scraper->fetchAnime(5923));
-var_dump($scraper->fetchAnime(6733));
-var_dump($scraper->fetchAnime(10544));
