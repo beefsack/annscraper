@@ -149,7 +149,7 @@ class ANNScraper_SearchAnimeGenres extends ANNScraper_Search
 		if (preg_match('/<STRONG>Genres:<\/STRONG>(.*?)<DIV CLASS="encyc/s', $data, $matches)) {
 			if (preg_match_all('/<SPAN><a href="[^"]*g=([^&"]*)[^>]*>([^<]*)<\/a><\/SPAN>/', $matches[1], $genres)) {
 				foreach ($genres[2] as $key => $name) {
-					$values = array(
+					$values[] = array(
 						'id' => $genres[1][$key],
 						'name' => $name,
 					);
@@ -171,7 +171,7 @@ class ANNScraper_SearchAnimeThemes extends ANNScraper_Search
 		if (preg_match('/<STRONG>Themes:<\/STRONG> (.*?)<DIV CLASS="encyc/s', $data, $matches)) {
 			if (preg_match_all('/<SPAN><a href="[^"]*th=([^&"]*)[^>]*>([^<]*)<\/a><\/SPAN>/', $matches[1], $themes)) {
 				foreach ($themes[2] as $key => $name) {
-					$values = array(
+					$values[] = array(
 						'id' => $themes[1][$key],
 						'name' => $name,
 					);
